@@ -3,206 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>大学生创业财政支持模拟平台 (DeepSeek AI版)</title>
-    <!-- 外部资源（无需修改） -->
+    <title>大学生创业财政支持模拟平台 (专业版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Chart.js for dynamic charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jsPDF and html2canvas for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- xlsx.js (SheetJS) for Excel export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        /* 基础样式（无需修改） */
         body {
             font-family: 'Inter', 'Helvetica Neue', 'Arial', sans-serif;
         }
         .gradient-bg {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
         }
-        /* 加载动画 */
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
             width: 24px;
             height: 24px;
             border-radius: 50%;
-            border-left-color: #2563eb; /* 蓝色加载动画 */
+            border-left-color: #09f;
             animation: spin 1s ease infinite;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        /* 提示通知（操作反馈） */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 20px;
-            border-radius: 4px;
-            color: white;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .toast.show {
-            opacity: 1;
-        }
-        .toast.success {
-            background-color: #10b981; /* 成功绿色 */
-        }
-        .toast.error {
-            background-color: #ef4444; /* 错误红色 */
-        }
+        .prose h3 { font-size: 1.2rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; }
+        .prose ul { list-style-type: disc; margin-left: 1.5rem; }
+        .prose strong { color: #1e40af; }
     </style>
 </head>
 <body class="gradient-bg text-gray-800">
-    <!-- 提示通知组件（无需修改） -->
-    <div id="toast" class="toast"></div>
 
-    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
-        <!-- 页头（标题+副标题） -->
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+        <!-- Header -->
         <header class="text-center mb-10">
             <h1 class="text-3xl md:text-4xl font-bold text-gray-900">大学生创业财政支持模拟平台</h1>
-            <p class="text-lg text-gray-600 mt-2">DeepSeek AI 驱动 · 政策分析+财务预测一体化</p>
+            <p class="text-lg text-gray-600 mt-2">一个为梦想加速的AI政策模拟沙盘 (DeepSeek AI 专业版)</p>
         </header>
 
-        <main class="space-y-12">
-            <!-- 1. 创业项目信息输入区 -->
-            <section class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg transform transition-all duration-300 hover:shadow-xl">
-                <h2 class="text-2xl font-semibold mb-4 border-b pb-2">1. 输入你的创业项目信息</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- 启动资金 -->
-                    <div>
+        <main class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            <!-- Input Section -->
+            <section class="lg:col-span-2 bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg h-fit">
+                <h2 class="text-2xl font-semibold mb-4 border-b pb-2">1. 输入项目信息</h2>
+                <div class="space-y-4">
+                     <div>
                         <label for="capital" class="block text-sm font-medium text-gray-700 mb-1">启动资金 (元)</label>
-                        <input type="number" id="capital" value="100000" min="1000" 
-                            class="w-full bg-white border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 transition duration-200">
+                        <input type="number" id="capital" value="100000" class="w-full bg-white border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2">
                     </div>
-                    <!-- 所属行业 -->
+                     <div>
+                        <label for="monthly_income" class="block text-sm font-medium text-gray-700 mb-1">预估月收入 (元)</label>
+                        <input type="number" id="monthly_income" value="20000" class="w-full bg-white border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2">
+                    </div>
+                    <div>
+                        <label for="monthly_cost" class="block text-sm font-medium text-gray-700 mb-1">预估月成本 (元)</label>
+                        <input type="number" id="monthly_cost" value="15000" class="w-full bg-white border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2">
+                    </div>
                     <div>
                         <label for="industry" class="block text-sm font-medium text-gray-700 mb-1">所属行业</label>
-                        <input type="text" id="industry" value="文化创意" 
-                            class="w-full bg-white border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 transition duration-200">
+                        <input type="text" id="industry" value="文化创意" class="w-full bg-white border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2">
                     </div>
-                    <!-- 所在地区（跨列） -->
-                    <div class="md:col-span-2">
+                    <div>
                         <label for="region" class="block text-sm font-medium text-gray-700 mb-1">所在地区</label>
-                        <input type="text" id="region" value="上海" 
-                            class="w-full bg-white border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 transition duration-200">
+                        <input type="text" id="region" value="上海" class="w-full bg-white border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2">
+                    </div>
+                     <div>
+                        <label for="subsidy_amount" class="block text-sm font-medium text-gray-700 mb-1">模拟补贴金额 (元)</label>
+                        <input type="number" id="subsidy_amount" value="10000" class="w-full bg-white border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2">
+                    </div>
+                    <div>
+                        <label for="project_description" class="block text-sm font-medium text-gray-700 mb-1">请简单描述项目需求</label>
+                        <textarea id="project_description" rows="4" class="w-full bg-white border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2" placeholder="例如：我们需要采购一批设备，并且需要一个便宜的办公场地..."></textarea>
                     </div>
                 </div>
-                <!-- 开始模拟按钮 -->
                 <div class="text-center mt-6">
-                    <button id="simulateBtn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-full hover:bg-blue-700 transition duration-300 shadow-md flex items-center justify-center mx-auto gap-2">
-                        <span id="simulateBtnText">✨ 开始AI政策分析</span>
+                    <button id="simulateBtn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-full hover:bg-blue-700 transition duration-300 shadow-md flex items-center justify-center mx-auto w-full">
+                        <span id="simulateBtnText">✨ 开始智能模拟</span>
                         <div id="simulateSpinner" class="spinner hidden"></div>
                     </button>
                 </div>
             </section>
 
-            <!-- 2. AI政策问答区 -->
-            <section class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg transform transition-all duration-300 hover:shadow-xl">
-                <h2 class="text-2xl font-semibold mb-4 border-b pb-2">2. DeepSeek AI 政策解析</h2>
-                <div id="qa-container" class="bg-gray-50 p-4 rounded-lg space-y-4 max-h-[500px] overflow-y-auto">
-                    <!-- 用户提问 -->
-                    <div class="flex items-start gap-3">
-                        <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold shrink-0">你</div>
-                        <div class="bg-blue-100 text-gray-800 p-3 rounded-lg max-w-md">
-                            <p id="user-question">请根据我的创业信息，分析可申请的政策支持</p>
-                        </div>
-                    </div>
-                    <!-- AI回答 -->
-                    <div id="ai-answer-container" class="flex items-start gap-3 justify-end">
-                        <div class="bg-gray-200 p-3 rounded-lg max-w-md text-left">
-                            <p class="font-semibold mb-2">DeepSeek 政策顾问 (AI):</p>
-                            <div id="ai-answer-text"><p>请填写上方项目信息，点击「开始AI政策分析」，我将为你精准匹配政策~</p></div>
-                        </div>
-                        <div class="w-8 h-8 rounded-full bg-gray-700 text-white flex items-center justify-center font-bold shrink-0">AI</div>
-                    </div>
+            <!-- Output Section -->
+            <section class="lg:col-span-3">
+                <div id="initial-message" class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg h-full flex items-center justify-center">
+                    <p class="text-gray-500 text-center">请在左侧输入信息后点击模拟，<br>此处将展示AI政策分析、财务图表及导出报告功能。</p>
                 </div>
-            </section>
+                
+                <div id="results-area" class="hidden space-y-8">
+                    <!-- Report Content Area for PDF Export -->
+                    <div id="report-content" class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
+                        <h2 class="text-2xl font-semibold mb-4 border-b pb-2">2. AI 政策匹配分析</h2>
+                        <div id="ai-answer-container" class="prose max-w-none">
+                           <!-- AI Answer will be rendered here -->
+                        </div>
+                        
+                        <hr class="my-6">
 
-            <!-- 3. 财务预测区（已删除图片） -->
-            <section class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg transform transition-all duration-300 hover:shadow-xl">
-                <h2 class="text-2xl font-semibold mb-4 border-b pb-2">3. 财务预测与风险提示</h2>
-                <div class="text-center">
-                    <!-- 已删除现金流对比图片及说明文字 -->
-                    
-                    <!-- 财务分析结果（优化间距） -->
-                    <div id="financial-analysis-container" class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <p class="text-green-800"><strong class="font-semibold">初始结论：</strong> 1万元首次创业补贴可使年末现金流从16万提升至17万，抗风险能力提升6.25%。点击下方按钮获取AI深度财务分析~</p>
+                        <h2 class="text-2xl font-semibold mb-4 border-b pb-2">3. 财务预测输出</h2>
+                        <div id="financial-summary" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                            <!-- Summary cards will be injected here by JS -->
+                        </div>
+
+                        <hr class="my-6">
+
+                        <h2 class="text-2xl font-semibold mb-4 border-b pb-2">4. 可视化图表</h2>
+                         <div class="w-full h-80">
+                           <canvas id="financial-chart"></canvas>
+                        </div>
                     </div>
-                    
-                    <!-- 生成财务分析按钮 -->
-                    <div class="text-center mt-6">
-                        <button id="analyzeBtn" class="bg-green-600 text-white font-bold py-3 px-8 rounded-full hover:bg-green-700 transition duration-300 shadow-md flex items-center justify-center mx-auto gap-2">
-                            <span id="analyzeBtnText">📊 生成AI财务分析</span>
-                            <div id="analyzeSpinner" class="spinner hidden"></div>
-                        </button>
+
+                    <!-- Export Section -->
+                    <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
+                        <h2 class="text-2xl font-semibold mb-4 border-b pb-2">5. 导出分析报告</h2>
+                        <p class="text-gray-600 mb-4">将以上分析结果保存为PDF文件或将详细财务数据导出为Excel表格。</p>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button id="exportPdfBtn" class="flex-1 bg-red-600 text-white font-bold py-3 px-6 rounded-full hover:bg-red-700 transition duration-300 shadow-md flex items-center justify-center">
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm6 10a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /><path d="M10 2a8 8 0 100 16 8 8 0 000-16zM2 10a8 8 0 1116 0 8 8 0 01-16 0z" /></svg>
+                                <span>导出为 PDF</span>
+                            </button>
+                            <button id="exportExcelBtn" class="flex-1 bg-green-600 text-white font-bold py-3 px-6 rounded-full hover:bg-green-700 transition duration-300 shadow-md flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm14 0H4v10h12V5zM6 7h8v2H6V7zm0 4h8v2H6v-2z" /></svg>
+                                <span>导出为 Excel</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
         </main>
-
-        <!-- 页脚 -->
-        <footer class="text-center mt-12">
-            <p class="text-gray-500">&copy; 2025 大学生创业财政支持模拟平台 | DeepSeek AI 驱动</p>
-        </footer>
     </div>
 
-<!-- JavaScript 核心逻辑（仅需填1个密钥） -->
 <script type="module">
-    // --------------------------
-    // 第一步：填写你的DeepSeek API密钥
-    // 密钥获取：https://www.deepseek.com/ → 个人中心 → API管理 → 生成密钥
-    const DEEPSEEK_API_KEY = 'sk-8dc826f0818b46088450e6dabfe5a785'; // 👇 在这里填你的密钥，比如 'dsk-abc123def456'
-    // --------------------------
-
-    // 固定配置（无需修改）
-    const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions'; // DeepSeek官方API地址
-    const POLICY_DATABASE = `
-        1. 首次创业一次性补贴:
-           - 适用：毕业5年内大学生+首次创业+正常经营6个月
-           - 金额：8000-15000元（地区不同有差异）
-           - 范围：全国多地（上海、北京、深圳等均有）
-        2. 小微企业税收减免:
-           - 适用：年利润≤100万+非限制行业
-           - 优惠：企业所得税实际税负≈5%（大幅低于常规25%）
-           - 范围：全国通用
-        3. 创业担保贷款:
-           - 适用：大学生创业者
-           - 额度：个人最高20万，政府贴息50%-100%
-           - 范围：全国
-        4. 创业带动就业补贴:
-           - 适用：招用毕业2年内大学生
-           - 金额：每招1人补贴2000-5000元
-           - 范围：全国多地
-    `;
-
-    // DOM元素（无需修改）
+    // --- DOM Elements ---
     const simulateBtn = document.getElementById('simulateBtn');
     const simulateBtnText = document.getElementById('simulateBtnText');
     const simulateSpinner = document.getElementById('simulateSpinner');
-    const analyzeBtn = document.getElementById('analyzeBtn');
-    const analyzeBtnText = document.getElementById('analyzeBtnText');
-    const analyzeSpinner = document.getElementById('analyzeSpinner');
-    const capitalInput = document.getElementById('capital');
-    const industryInput = document.getElementById('industry');
-    const regionInput = document.getElementById('region');
-    const userQuestion = document.getElementById('user-question');
-    const aiAnswerText = document.getElementById('ai-answer-text');
-    const financialAnalysisContainer = document.getElementById('financial-analysis-container');
-    const toast = document.getElementById('toast');
+    
+    const initialMessage = document.getElementById('initial-message');
+    const resultsArea = document.getElementById('results-area');
+    const aiAnswerContainer = document.getElementById('ai-answer-container');
+    const financialSummaryContainer = document.getElementById('financial-summary');
+    const financialChartCanvas = document.getElementById('financial-chart');
+    
+    const exportPdfBtn = document.getElementById('exportPdfBtn');
+    const exportExcelBtn = document.getElementById('exportExcelBtn');
+    
+    let financialChart = null;
+    let financialDataForExport = null;
 
-    // 显示提示通知（无需修改）
-    function showToast(message, isError = false) {
-        toast.textContent = message;
-        toast.className = 'toast';
-        toast.classList.add(isError ? 'error' : 'success');
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
-    }
+    // --- DeepSeek AI Configuration ---
+    const DEEPSEEK_API_KEY = "sk-8dc826f0818b46088450e6dabfe5a785"; // 👉 在此处填写你的DeepSeek API密钥（获取地址：https://www.deepseek.com/console/api-keys）
+    const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
+    
+    const POLICY_DATABASE = `
+    - **政策名称:** 首次创业一次性补贴 | **适用区域:** 全国多地（如上海、深圳） | **核心条件:** 毕业5年内高校毕业生, 首次在当地创办小微企业, 正常经营6个月以上 | **补贴详情:** 补贴 8,000 - 15,000 元不等，一次性发放。
+    - **政策名称:** 小微企业普惠性税收减免 | **适用区域:** 全国 | **核心条件:** 年应纳税所得额不超过100万元 | **补贴详情:** 年应纳税所得额不超过100万元的部分，实际企业所得税税负为5%。
+    - **政策名称:** 创业担保贷款及贴息 | **适用区域:** 全国 | **核心条件:** 符合条件的高校毕业生等 | **补贴详情:** 政府对贷款利息进行补贴，创业者实际承担的利息极低。
+    - **政策名称:** 创业带动就业补贴 | **适用区域:** 全国多地 | **核心条件:** 初创企业招用毕业2年内高校毕业生 | **补贴详情:** 每招用一人，给予企业 2,000 - 5,000 元的一次性补贴。
+    `;
 
-    // 按钮加载状态切换（无需修改）
-    function setButtonLoading(btnTextEl, spinnerEl, isLoading) {
+    // --- Helper Functions ---
+    function setButtonLoading(btnTextEl, spinnerEl, btnEl, isLoading) {
+        btnEl.disabled = isLoading;
         if (isLoading) {
             btnTextEl.classList.add('hidden');
             spinnerEl.classList.remove('hidden');
@@ -211,134 +177,222 @@
             spinnerEl.classList.add('hidden');
         }
     }
-
-    // 核心：调用DeepSeek AI（无需修改）
+    
+    // 调用DeepSeek AI的核心函数
     async function callDeepSeekAI(prompt) {
-        // 检查密钥是否填写
-        if (!DEEPSEEK_API_KEY) {
-            showToast('请先填写DeepSeek API密钥！', true);
-            return "API密钥未配置，请在代码中填写你的DeepSeek密钥。";
-        }
-
         try {
-            // DeepSeek要求的请求格式（固定）
+            // 构建符合DeepSeek要求的请求体
             const payload = {
-                model: 'deepseek-chat', // DeepSeek对话模型（固定值）
-                messages: [
-                    { role: 'user', content: prompt } // 用户提问内容
-                ],
-                temperature: 0.7, // 回答灵活度（0.7适中）
-                max_tokens: 1000 // 最大回答长度（足够用）
+                model: "deepseek-chat", // DeepSeek对话模型（固定值）
+                messages: [{ role: "user", content: prompt }], // 用户提问
+                temperature: 0.7, // 回答灵活度
+                max_tokens: 1000 // 最大回答长度
             };
-
-            // 发送请求到DeepSeek
+            
+            // 发送请求到DeepSeek API
             const response = await fetch(DEEPSEEK_API_URL, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${DEEPSEEK_API_KEY}` // 密钥验证（固定格式）
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${DEEPSEEK_API_KEY}` // 密钥认证
                 },
                 body: JSON.stringify(payload)
             });
-
-            // 处理请求错误
-            if (!response.ok) throw new Error(`API请求失败（${response.status}）`);
-
-            // 解析DeepSeek返回的结果
+            
+            // 处理请求失败
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`API调用失败: ${response.status} - ${errorData.error?.message || "未知错误"}`);
+            }
+            
+            // 解析返回结果
             const result = await response.json();
             const aiAnswer = result.choices?.[0]?.message?.content;
-            return aiAnswer || "AI暂时无法回答，请稍后重试~";
+            return aiAnswer || "抱歉，AI未能生成有效回复。";
         } catch (error) {
-            console.error("AI调用错误：", error);
-            showToast(`AI出错：${error.message}`, true);
-            return `获取AI分析失败：${error.message}`;
+            console.error("DeepSeek API调用错误:", error);
+            return `网络或API请求出错: ${error.message}。`;
         }
     }
 
-    // 事件1：点击「开始AI政策分析」（无需修改）
+    // --- 财务数据生成与渲染 ---
+    function generateFinancialData(inputs) {
+        const data = {
+            months: [],
+            noSubsidy: [],
+            withSubsidy: []
+        };
+
+        let cashNoSubsidy = Number(inputs.capital);
+        let cashWithSubsidy = Number(inputs.capital) + Number(inputs.subsidy_amount);
+        const netFlow = Number(inputs.monthly_income) - Number(inputs.monthly_cost);
+
+        for (let i = 1; i <= 12; i++) {
+             // 第1个月：启动资金 + 首月净现金流（补贴已预先加入withSubsidy）
+            if (i === 1) {
+                cashNoSubsidy += netFlow;
+                cashWithSubsidy += netFlow;
+            } else { 
+               cashNoSubsidy += netFlow;
+               cashWithSubsidy += netFlow;
+            }
+            data.months.push(`第${i}月`);
+            data.noSubsidy.push(cashNoSubsidy);
+            data.withSubsidy.push(cashWithSubsidy);
+        }
+        return data;
+    }
+
+    function renderFinancialSummary(data, subsidyAmount) {
+        const endCashNoSubsidy = data.noSubsidy[data.noSubsidy.length - 1];
+        const endCashWithSubsidy = data.withSubsidy[data.withSubsidy.length - 1];
+        const netGain = subsidyAmount; 
+
+        const formatCurrency = (value) => new Intl.NumberFormat('zh-CN', { style: 'currency', currency: 'CNY' }).format(value);
+
+        financialSummaryContainer.innerHTML = `
+            <div class="bg-blue-100 p-4 rounded-lg text-center shadow">
+                <p class="text-sm font-medium text-blue-700">年末现金 (有补贴)</p>
+                <p class="text-2xl font-bold text-blue-900">${formatCurrency(endCashWithSubsidy)}</p>
+            </div>
+            <div class="bg-red-100 p-4 rounded-lg text-center shadow">
+                <p class="text-sm font-medium text-red-700">年末现金 (无补贴)</p>
+                <p class="text-2xl font-bold text-red-900">${formatCurrency(endCashNoSubsidy)}</p>
+            </div>
+            <div class="bg-green-100 p-4 rounded-lg text-center shadow">
+                <p class="text-sm font-medium text-green-700">补贴带来净增益</p>
+                <p class="text-2xl font-bold text-green-900">${formatCurrency(netGain)}</p>
+            </div>
+        `;
+    }
+
+    function renderChart(data) {
+        if (financialChart) {
+            financialChart.destroy();
+        }
+        const ctx = financialChartCanvas.getContext('2d');
+        financialChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.months,
+                datasets: [{
+                    label: '无补贴期末现金',
+                    data: data.noSubsidy,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }, {
+                    label: '有补贴期末现金',
+                    data: data.withSubsidy,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: false, ticks: { callback: (value) => `¥${value / 1000}k` } } },
+                plugins: {
+                    title: { display: true, text: '12个月现金流模拟对比', font: { size: 16 } },
+                    tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${new Intl.NumberFormat('zh-CN', { style: 'currency', currency: 'CNY' }).format(c.raw)}` } }
+                }
+            }
+        });
+    }
+
+    // --- 按钮点击事件 ---
     simulateBtn.addEventListener('click', async () => {
-        // 验证输入是否完整
-        const capital = capitalInput.value.trim();
-        const industry = industryInput.value.trim();
-        const region = regionInput.value.trim();
-        if (!capital || !industry || !region) {
-            showToast('请填写完整的项目信息！', true);
+        setButtonLoading(simulateBtnText, simulateSpinner, simulateBtn, true);
+        initialMessage.classList.add('hidden');
+        resultsArea.classList.remove('hidden');
+        aiAnswerContainer.innerHTML = '<div class="spinner mx-auto"></div>';
+        financialSummaryContainer.innerHTML = '';
+
+
+        const inputs = {
+            capital: document.getElementById('capital').value,
+            industry: document.getElementById('industry').value,
+            region: document.getElementById('region').value,
+            monthly_income: document.getElementById('monthly_income').value,
+            monthly_cost: document.getElementById('monthly_cost').value,
+            subsidy_amount: document.getElementById('subsidy_amount').value,
+            project_description: document.getElementById('project_description').value
+        };
+
+        // --- 1. AI政策分析（调用DeepSeek）---
+        const userSituation = `我是一名准备创业的大学生，项目基本情况如下：启动资金${inputs.capital}元，预估月收入${inputs.monthly_income}元，预估月成本${inputs.monthly_cost}元，所属行业是“${inputs.industry}”，计划在“${inputs.region}”发展。我的具体需求是：“${inputs.project_description}”。`;
+        const prompt = `你是一位专业的大学生创业政策顾问。请严格根据下面提供的政策库信息，为一位创业者分析他可能申请到的政策。在分析时，请重点关注他的“具体需求”。政策库：${POLICY_DATABASE} 创业者情况：${userSituation} 请以亲切、专业的口吻，逐条分析他最可能符合的2-3项政策，并说明理由。最后给一句鼓励的话。`;
+        const responseText = await callDeepSeekAI(prompt);
+        let htmlResponse = responseText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+        aiAnswerContainer.innerHTML = htmlResponse;
+
+        // --- 2. 财务数据生成、摘要与图表 ---
+        const financialData = generateFinancialData(inputs);
+        financialDataForExport = financialData; // 保存用于导出
+        renderFinancialSummary(financialData, Number(inputs.subsidy_amount));
+        renderChart(financialData);
+
+        setButtonLoading(simulateBtnText, simulateSpinner, simulateBtn, false);
+    });
+
+    exportPdfBtn.addEventListener('click', () => {
+        const { jsPDF } = window.jspdf;
+        const reportContent = document.getElementById('report-content');
+        
+        const confirmation = document.createElement('div');
+        confirmation.textContent = '正在生成PDF报告，请稍候...';
+        confirmation.style.cssText = `
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
+            background-color: #2c5282; color: white; padding: 10px 20px; border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000;
+        `;
+        document.body.appendChild(confirmation);
+
+        html2canvas(reportContent, { 
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff'
+        }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'pt',
+                format: [canvas.width, canvas.height]
+            });
+            pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+            pdf.save("创业财政支持分析报告.pdf");
+            document.body.removeChild(confirmation);
+        }).catch(err => {
+            console.error("PDF生成失败:", err);
+            document.body.removeChild(confirmation);
+            alert("抱歉，PDF生成失败，请检查控制台获取更多信息。");
+        });
+    });
+
+    exportExcelBtn.addEventListener('click', () => {
+        if (!financialDataForExport) {
+            alert("请先进行模拟，生成财务数据后再导出。");
             return;
         }
 
-        // 显示加载状态
-        setButtonLoading(simulateBtnText, simulateSpinner, true);
-        aiAnswerText.innerHTML = '<div class="spinner mx-auto"></div>'; // AI回答区加载动画
-
-        // 构造给AI的提问（包含政策库+用户信息）
-        const userInfo = `
-            创业者情况：
-            - 身份：大学生
-            - 启动资金：${capital}元
-            - 所属行业：${industry}
-            - 所在地区：${region}
-        `;
-        const aiPrompt = `
-            你是专业的大学生创业政策顾问，请根据以下政策库和用户信息，完成：
-            1. 分析用户最符合的2-3项政策（说明理由，结合地区和行业）；
-            2. 每项政策简要说明申请条件和补贴金额；
-            3. 最后加一句鼓励的话（亲切、简洁）。
-
-            政策库：${POLICY_DATABASE}
-            ${userInfo}
-        `;
-
-        // 调用AI并显示结果
-        const aiResult = await callDeepSeekAI(aiPrompt);
-        // 格式化AI回答（换行转HTML）
-        const formattedResult = aiResult
-            .replace(/\n/g, '<br>')
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        aiAnswerText.innerHTML = formattedResult;
-        userQuestion.textContent = `我的项目：启动资金${capital}元，${industry}行业，${region}地区，分析可申请的政策`;
-
-        // 关闭加载状态
-        setButtonLoading(simulateBtnText, simulateSpinner, false);
-        showToast('政策分析已生成！');
-    });
-
-    // 事件2：点击「生成AI财务分析」（无需修改）
-    analyzeBtn.addEventListener('click', async () => {
-        // 显示加载状态
-        setButtonLoading(analyzeBtnText, analyzeSpinner, true);
-        financialAnalysisContainer.innerHTML = '<div class="spinner mx-auto"></div>';
-
-        // 构造财务分析的AI提问
-        const aiPrompt = `
-            你是大学生创业财务分析师，根据以下数据做分析：
-            - 初始资金：10万元
-            - 无补贴：年末现金流16万元
-            - 有1万元首次创业补贴：年末现金流17万元
-
-            要求：
-            1. 说明补贴对现金流的直接影响（数据化）；
-            2. 分析1万元在创业初期的战略意义（比如抗风险、抓机遇）；
-            3. 提1个关键财务风险点（比如现金流储备）；
-            4. 语气专业但亲切，带鼓励性，总字数控制在200字内。
-        `;
-
-        // 调用AI并显示结果
-        const aiResult = await callDeepSeekAI(aiPrompt);
-        const formattedResult = aiResult
-            .replace(/\n/g, '<br>')
-            .replace(/\*\*(.*?)\*\*/g, '<strong class="text-green-900">$1</strong>');
-        financialAnalysisContainer.innerHTML = `<div class="text-green-800">${formattedResult}</div>`;
-
-        // 关闭加载状态
-        setButtonLoading(analyzeBtnText, analyzeSpinner, false);
-        showToast('财务分析已生成！');
-    });
-
-    // 页面加载提示（无需修改）
-    window.addEventListener('load', () => {
-        if (!DEEPSEEK_API_KEY) {
-            showToast('请先在代码中填写DeepSeek API密钥', true);
+        const worksheetData = [
+            ["月份", "无补贴期末现金 (元)", "有补贴期末现金 (元)"]
+        ];
+        for (let i = 0; i < 12; i++) {
+            worksheetData.push([
+                financialDataForExport.months[i],
+                financialDataForExport.noSubsidy[i],
+                financialDataForExport.withSubsidy[i]
+            ]);
         }
+        
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+        XLSX.utils.book_append_sheet(wb, ws, "财务模拟数据");
+        XLSX.writeFile(wb, "财务模拟数据.xlsx");
     });
 </script>
 </body>
